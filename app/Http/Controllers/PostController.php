@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class PostController extends Controller
@@ -101,33 +101,11 @@ class PostController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'image' => 'nullable|image|max:2048',
-            'remove_image' => 'nullable|boolean',
         ]);
-
-        $imagePath = $post->image;
-
-        // Handle image removal
-        if ($request->has('remove_image') && $request->remove_image) {
-            if ($post->image) {
-                Storage::disk('public')->delete($post->image);
-            }
-            $imagePath = null;
-        }
-
-        // Handle new image upload
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($post->image) {
-                Storage::disk('public')->delete($post->image);
-            }
-            $imagePath = $request->file('image')->store('posts', 'public');
-        }
 
         $post->update([
             'title' => $validated['title'],
             'content' => $validated['content'],
-            'image' => $imagePath,
         ]);
 
         return redirect()->route('posts.show', $post->id)->with('success', 'Post updated successfully.');
@@ -136,8 +114,17 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Post $post)
     {
-        //
+
+        Gate::authorize('delete', $post);
+
+        if ($post->image) {
+            Storage::disk('public')->delete($post->image);
+        }
+
+        $post->delete();
+
+        return redirect()->route('dashboard')->with('success', 'Post deleted successfully.');
     }
 }

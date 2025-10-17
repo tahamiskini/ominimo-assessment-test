@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import {
     Calendar,
     Edit,
@@ -8,6 +8,7 @@ import {
     MessageCircle,
     MoreVertical,
     Plus,
+    Trash2,
 } from 'lucide-react';
 import { useState } from 'react';
 import { routes } from '../lib/routes';
@@ -42,6 +43,50 @@ interface DashboardProps {
 
 export default function Dashboard({ posts, auth }: DashboardProps) {
     const [openMenu, setOpenMenu] = useState<number | null>(null);
+    const [deleteModal, setDeleteModal] = useState<{
+        isOpen: boolean;
+        postId: number | null;
+        postTitle: string;
+    }>({
+        isOpen: false,
+        postId: null,
+        postTitle: '',
+    });
+
+    const { delete: destroy } = useForm();
+
+    const handleDeleteClick = (
+        postId: number,
+        postTitle: string,
+        e: React.MouseEvent,
+    ) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDeleteModal({
+            isOpen: true,
+            postId,
+            postTitle,
+        });
+        setOpenMenu(null);
+    };
+
+    const handleDeleteConfirm = () => {
+        if (deleteModal.postId) {
+            destroy(routes.deletePost(deleteModal.postId), {
+                onSuccess: () => {
+                    setDeleteModal({
+                        isOpen: false,
+                        postId: null,
+                        postTitle: '',
+                    });
+                },
+            });
+        }
+    };
+
+    const handleDeleteCancel = () => {
+        setDeleteModal({ isOpen: false, postId: null, postTitle: '' });
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -105,7 +150,7 @@ export default function Dashboard({ posts, auth }: DashboardProps) {
 
                                                 {/* Dropdown Menu */}
                                                 {openMenu === post.id && (
-                                                    <div className="absolute top-8 right-0 z-10 w-32 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+                                                    <div className="absolute top-8 right-0 z-10 w-40 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
                                                         <Link
                                                             href={routes.editPost(
                                                                 post.id,
@@ -121,6 +166,19 @@ export default function Dashboard({ posts, auth }: DashboardProps) {
                                                             <Edit className="h-4 w-4" />
                                                             Edit
                                                         </Link>
+                                                        <button
+                                                            onClick={(e) =>
+                                                                handleDeleteClick(
+                                                                    post.id,
+                                                                    post.title,
+                                                                    e,
+                                                                )
+                                                            }
+                                                            className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                            Delete
+                                                        </button>
                                                     </div>
                                                 )}
                                             </div>
@@ -193,6 +251,40 @@ export default function Dashboard({ posts, auth }: DashboardProps) {
                     </div>
                 ))}
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {deleteModal.isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
+                    <div className="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                        <div className="mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                Delete Post
+                            </h3>
+                            <p className="mt-2 text-sm text-gray-600">
+                                Are you sure you want to delete "
+                                <span className="font-medium">
+                                    {deleteModal.postTitle}
+                                </span>
+                                "? This action cannot be undone.
+                            </p>
+                        </div>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={handleDeleteCancel}
+                                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDeleteConfirm}
+                                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                            >
+                                Delete Post
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AppLayout>
     );
 }

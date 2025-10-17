@@ -5,4 +5,5 @@ export const routes = {
     showPost: (id: number) => `/posts/${id}`,
     editPost: (id: number) => `/posts/${id}/edit`,
     updatePost: (id: number) => `/posts/${id}`,
+    deletePost: (id: number) => `/posts/${id}`,
 };

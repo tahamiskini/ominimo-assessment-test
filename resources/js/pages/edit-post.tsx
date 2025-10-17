@@ -1,8 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, FileText, ImagePlus, Trash2, Type, X } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowLeft, FileText, ImagePlus, Type } from 'lucide-react';
 import { routes } from '../lib/routes';
 
 interface EditPostProps {
@@ -24,42 +23,11 @@ export default function EditPost({ post }: EditPostProps) {
     const { data, setData, put, processing, errors } = useForm({
         title: post.title,
         content: post.content,
-        image: null as File | null,
-        remove_image: false,
     });
-
-    const [imagePreview, setImagePreview] = useState<string | null>(
-        post.image_url,
-    );
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         put(routes.updatePost(post.id));
-    };
-
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files ? e.target.files[0] : null;
-        setData('image', file);
-
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                setImagePreview(e.target?.result as string);
-            };
-            reader.readAsDataURL(file);
-            setData('remove_image', false);
-        }
-    };
-
-    const handleRemoveImage = () => {
-        setData('remove_image', true);
-        setImagePreview(null);
-        setData('image', null);
-    };
-
-    const handleRestoreImage = () => {
-        setData('remove_image', false);
-        setImagePreview(post.image_url);
     };
 
     return (
@@ -182,11 +150,15 @@ export default function EditPost({ post }: EditPostProps) {
                             )}
                         </div>
 
-                        {/* Current Image Section */}
-                        {post.image && !data.remove_image && (
+                        {/* Current Image Display (Read-only) */}
+                        {post.image_url && (
                             <div className="group">
                                 <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                    <ImagePlus className="h-4 w-4 text-blue-600" />
                                     Current Featured Image
+                                    <span className="text-xs font-normal text-gray-500">
+                                        (Preserved)
+                                    </span>
                                 </label>
                                 <div className="flex items-center justify-between rounded-xl border-2 border-green-200 bg-green-50 px-4 py-3">
                                     <div className="flex items-center gap-3">
@@ -199,122 +171,37 @@ export default function EditPost({ post }: EditPostProps) {
                                             <p className="text-sm font-medium text-gray-900">
                                                 Current post image
                                             </p>
-                                            <button
-                                                type="button"
-                                                onClick={handleRemoveImage}
-                                                className="mt-1 flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                                Remove image
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Image Removed Message */}
-                        {data.remove_image && (
-                            <div className="rounded-xl border-2 border-orange-200 bg-orange-50 px-4 py-3">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="rounded-lg bg-orange-100 p-2">
-                                            <Trash2 className="h-5 w-5 text-orange-600" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-900">
-                                                Image will be removed
-                                            </p>
                                             <p className="text-xs text-gray-600">
-                                                The current image will be
-                                                deleted when you update the post
+                                                Image editing temporarily
+                                                unavailable
                                             </p>
                                         </div>
                                     </div>
-                                    <button
-                                        type="button"
-                                        onClick={handleRestoreImage}
-                                        className="text-sm text-blue-600 hover:text-blue-700"
-                                    >
-                                        Undo
-                                    </button>
                                 </div>
                             </div>
                         )}
 
-                        {/* Image Upload Field */}
+                        {/* Image Upload Field (Disabled) */}
                         <div className="group">
                             <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700">
                                 <ImagePlus className="h-4 w-4 text-blue-600" />
-                                {post.image && !data.remove_image
-                                    ? 'Replace Image'
-                                    : 'Featured Image'}
+                                Featured Image
                                 <span className="text-xs font-normal text-gray-500">
-                                    (Optional)
+                                    (Temporarily unavailable)
                                 </span>
                             </label>
 
-                            {!data.image ? (
-                                <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-6 py-8 transition-all hover:border-blue-400 hover:bg-blue-50">
-                                    <div className="mb-3 rounded-full bg-blue-100 p-3">
-                                        <ImagePlus className="h-6 w-6 text-blue-600" />
-                                    </div>
-                                    <span className="mb-1 text-sm font-medium text-gray-700">
-                                        {post.image && !data.remove_image
-                                            ? 'Click to replace image'
-                                            : 'Click to upload image'}
-                                    </span>
-                                    <span className="text-xs text-gray-500">
-                                        PNG, JPG, GIF up to 2MB
-                                    </span>
-                                    <input
-                                        type="file"
-                                        className="hidden"
-                                        accept="image/*"
-                                        onChange={handleImageChange}
-                                    />
-                                </label>
-                            ) : (
-                                <div className="flex items-center justify-between rounded-xl border-2 border-green-200 bg-green-50 px-4 py-3">
-                                    <div className="flex items-center gap-3">
-                                        {imagePreview && (
-                                            <img
-                                                src={imagePreview}
-                                                alt="New image preview"
-                                                className="h-16 w-16 rounded-lg object-cover"
-                                            />
-                                        )}
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-900">
-                                                {data.image.name}
-                                            </p>
-                                            <p className="text-xs text-gray-600">
-                                                {(
-                                                    data.image.size / 1024
-                                                ).toFixed(2)}{' '}
-                                                KB
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setData('image', null);
-                                            setImagePreview(post.image_url);
-                                        }}
-                                        className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-white hover:text-red-600"
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </button>
+                            <div className="flex cursor-not-allowed flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-100 px-6 py-8 opacity-50">
+                                <div className="mb-3 rounded-full bg-gray-200 p-3">
+                                    <ImagePlus className="h-6 w-6 text-gray-400" />
                                 </div>
-                            )}
-
-                            {errors.image && (
-                                <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
-                                    <span className="font-medium">⚠</span>
-                                    {errors.image}
-                                </p>
-                            )}
+                                <span className="mb-1 text-sm font-medium text-gray-500">
+                                    Image editing temporarily disabled
+                                </span>
+                                <span className="text-xs text-gray-400">
+                                    Current image will be preserved
+                                </span>
+                            </div>
                         </div>
                     </div>
 
