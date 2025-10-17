@@ -6,4 +6,5 @@ export const routes = {
     editPost: (id: number) => `/posts/${id}/edit`,
     updatePost: (id: number) => `/posts/${id}`,
     deletePost: (id: number) => `/posts/${id}`,
+    likePost: (id: number) => `/posts/${id}/like`,
 };
