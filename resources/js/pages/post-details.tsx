@@ -1,7 +1,6 @@
-// post-detail.tsx
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeft, Calendar, Heart, MessageCircle } from 'lucide-react';
 import { routes } from '../lib/routes';
 
@@ -24,10 +23,30 @@ interface PostDetailProps {
 }
 
 export default function PostDetail({ post }: PostDetailProps) {
+    const { auth } = usePage().props;
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Home', href: routes.dashboard() },
         { title: 'Post Details', href: '#' },
     ];
+
+    const handleLike = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        router.post(
+            routes.likePost(post.id),
+            {},
+            {
+                preserveScroll: true,
+                preserveState: true,
+            },
+        );
+    };
+
+    const isLikedByUser = post.likes.some(
+        (like) => like.user.id === auth.user.id,
+    );
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -101,12 +120,28 @@ export default function PostDetail({ post }: PostDetailProps) {
 
                                 {/* Engagement Stats */}
                                 <div className="mt-6 flex items-center gap-6 border-t border-gray-100 pt-6">
-                                    <div className="flex items-center gap-2 text-gray-600">
-                                        <Heart className="h-5 w-5" />
+                                    {/* ✅ Like Button */}
+                                    <button
+                                        className={`flex items-center gap-2 transition ${
+                                            isLikedByUser
+                                                ? 'text-red-600 hover:text-red-700'
+                                                : 'text-gray-600 hover:text-red-600'
+                                        }`}
+                                        onClick={handleLike}
+                                    >
+                                        <Heart
+                                            className={`h-5 w-5 ${
+                                                isLikedByUser
+                                                    ? 'fill-red-600 text-red-600'
+                                                    : ''
+                                            }`}
+                                        />
                                         <span className="font-semibold">
                                             {post.likes.length} likes
                                         </span>
-                                    </div>
+                                    </button>
+
+                                    {/* Comments Count */}
                                     <div className="flex items-center gap-2 text-gray-600">
                                         <MessageCircle className="h-5 w-5" />
                                         <span className="font-semibold">
