@@ -3,4 +3,6 @@ export const routes = {
     createPost: () => '/posts/create',
     storePost: () => '/posts',
     showPost: (id: number) => `/posts/${id}`,
+    editPost: (id: number) => `/posts/${id}/edit`,
+    updatePost: (id: number) => `/posts/${id}`,
 };

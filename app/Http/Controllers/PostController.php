@@ -6,6 +6,7 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class PostController extends Controller
@@ -81,17 +82,55 @@ class PostController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Post $post)
     {
-        //
+        Gate::authorize('update', $post);
+
+        return Inertia::render('edit-post', [
+            'post' => $post,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Post $post)
     {
-        //
+        Gate::authorize('update', $post);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'image' => 'nullable|image|max:2048',
+            'remove_image' => 'nullable|boolean',
+        ]);
+
+        $imagePath = $post->image;
+
+        // Handle image removal
+        if ($request->has('remove_image') && $request->remove_image) {
+            if ($post->image) {
+                Storage::disk('public')->delete($post->image);
+            }
+            $imagePath = null;
+        }
+
+        // Handle new image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($post->image) {
+                Storage::disk('public')->delete($post->image);
+            }
+            $imagePath = $request->file('image')->store('posts', 'public');
+        }
+
+        $post->update([
+            'title' => $validated['title'],
+            'content' => $validated['content'],
+            'image' => $imagePath,
+        ]);
+
+        return redirect()->route('posts.show', $post->id)->with('success', 'Post updated successfully.');
     }
 
     /**
