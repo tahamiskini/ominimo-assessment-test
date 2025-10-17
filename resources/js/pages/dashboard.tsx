@@ -37,6 +37,7 @@ interface DashboardProps {
             id: number;
             name: string;
             email: string;
+            role: string;
         };
     };
 }
@@ -55,7 +56,6 @@ export default function Dashboard({ posts, auth }: DashboardProps) {
 
     const { delete: destroy } = useForm();
 
-    // 🧨 Handle delete
     const handleDeleteClick = (
         postId: number,
         postTitle: string,
@@ -150,8 +150,10 @@ export default function Dashboard({ posts, auth }: DashboardProps) {
                                                 {post.title}
                                             </h2>
 
-                                            {/* Edit Menu - Only show for post owner */}
-                                            {auth.user.id === post.user.id && (
+                                            {/* Edit Menu - Only show for post owner /admin */}
+                                            {(auth.user.role === 'admin' ||
+                                                auth.user.id ===
+                                                    post.user.id) && (
                                                 <div className="relative">
                                                     <button
                                                         className="rounded-lg p-1.5 text-gray-400 opacity-0 transition group-hover:opacity-100 hover:bg-gray-100 hover:text-gray-600"

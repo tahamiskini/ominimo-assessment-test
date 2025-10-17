@@ -14,6 +14,14 @@ class DatabaseSeeder extends Seeder
         // Create 5 users
         $users = User::factory(5)->create();
 
+        User::factory()->create([
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'password' => bcrypt('password'),
+            'role' => 'admin',
+        ]);
+        
+
         // Each user gets 3 posts
         $users->each(function ($user) use ($users) {
             $posts = Post::factory(3)->create([

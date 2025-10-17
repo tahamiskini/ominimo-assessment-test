@@ -215,7 +215,9 @@ export default function PostDetail({ post }: PostDetailProps) {
                                                     {(auth.user?.id ===
                                                         comment.user?.id ||
                                                         auth.user?.id ===
-                                                            post.user.id) && (
+                                                            post.user.id ||
+                                                        auth.user.role ===
+                                                            'admin') && (
                                                         <button
                                                             className="text-red-600 hover:text-red-700"
                                                             onClick={() =>

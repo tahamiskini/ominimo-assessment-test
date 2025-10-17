@@ -24,6 +24,10 @@ class CommentPolicy
             return Response::deny('Comment is missing its post.');
         }
 
+        if ($user->role === 'admin') {
+            return Response::allow();
+        }
+
         return ($user->id === $comment->user_id || $user->id === $comment->post->user_id)
             ? Response::allow()
             : Response::deny('You cannot delete this comment.');
