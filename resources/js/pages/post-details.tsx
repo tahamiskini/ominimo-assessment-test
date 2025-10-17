@@ -1,7 +1,8 @@
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, router, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, Calendar, Heart, MessageCircle } from 'lucide-react';
+import { useState } from 'react';
 import { routes } from '../lib/routes';
 
 interface PostDetailProps {
@@ -16,20 +17,22 @@ interface PostDetailProps {
             id: number;
             comment: string;
             created_at: string;
-            user: { id: number; name: string };
+            user: { id: number; name: string } | null;
         }[];
         likes: { id: number; user: { id: number; name: string } }[];
     };
 }
 
 export default function PostDetail({ post }: PostDetailProps) {
-    const { auth } = usePage().props;
+    //@ts-expect-error : auth type
+    const { auth }: any = usePage().props;
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Home', href: routes.dashboard() },
         { title: 'Post Details', href: '#' },
     ];
 
+    // Like functionality
     const handleLike = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -37,16 +40,37 @@ export default function PostDetail({ post }: PostDetailProps) {
         router.post(
             routes.likePost(post.id),
             {},
-            {
-                preserveScroll: true,
-                preserveState: true,
-            },
+            { preserveScroll: true, preserveState: true },
         );
     };
-
     const isLikedByUser = post.likes.some(
         (like) => like.user.id === auth.user.id,
     );
+
+    // Comment form using Inertia's useForm
+    const {
+        data,
+        setData,
+        post: addComment,
+        delete: deleteComment,
+    } = useForm({ comment: '' });
+    const [deletingCommentId, setDeletingCommentId] = useState<number | null>(
+        null,
+    );
+
+    const handleCommentSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        addComment(routes.addComment(post.id), {
+            onSuccess: () => setData('comment', ''),
+        });
+    };
+
+    const handleDeleteComment = (commentId: number) => {
+        setDeletingCommentId(commentId);
+        deleteComment(routes.deleteComment(commentId), {
+            onFinish: () => setDeletingCommentId(null),
+        });
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -67,7 +91,6 @@ export default function PostDetail({ post }: PostDetailProps) {
                     {/* Post Content */}
                     <div className="lg:col-span-2">
                         <article className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
-                            {/* Post Image */}
                             {post.image_url && (
                                 <div className="relative h-80 w-full overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
                                     <img
@@ -77,8 +100,6 @@ export default function PostDetail({ post }: PostDetailProps) {
                                     />
                                 </div>
                             )}
-
-                            {/* Post Content */}
                             <div className="p-6">
                                 <h1 className="mb-4 text-3xl font-bold text-gray-900">
                                     {post.title}
@@ -120,7 +141,6 @@ export default function PostDetail({ post }: PostDetailProps) {
 
                                 {/* Engagement Stats */}
                                 <div className="mt-6 flex items-center gap-6 border-t border-gray-100 pt-6">
-                                    {/* ✅ Like Button */}
                                     <button
                                         className={`flex items-center gap-2 transition ${
                                             isLikedByUser
@@ -130,18 +150,13 @@ export default function PostDetail({ post }: PostDetailProps) {
                                         onClick={handleLike}
                                     >
                                         <Heart
-                                            className={`h-5 w-5 ${
-                                                isLikedByUser
-                                                    ? 'fill-red-600 text-red-600'
-                                                    : ''
-                                            }`}
+                                            className={`h-5 w-5 ${isLikedByUser ? 'fill-red-600 text-red-600' : ''}`}
                                         />
                                         <span className="font-semibold">
                                             {post.likes.length} likes
                                         </span>
                                     </button>
 
-                                    {/* Comments Count */}
                                     <div className="flex items-center gap-2 text-gray-600">
                                         <MessageCircle className="h-5 w-5" />
                                         <span className="font-semibold">
@@ -181,15 +196,37 @@ export default function PostDetail({ post }: PostDetailProps) {
                                                 key={comment.id}
                                                 className="rounded-xl border border-gray-100 bg-gray-50 p-4"
                                             >
-                                                <div className="mb-2 flex items-center gap-2">
-                                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-600">
-                                                        {comment.user.name
-                                                            .charAt(0)
-                                                            .toUpperCase()}
+                                                <div className="mb-2 flex items-center justify-between">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-600">
+                                                            {comment.user?.name
+                                                                ?.charAt(0)
+                                                                ?.toUpperCase() ||
+                                                                'G'}
+                                                        </div>
+                                                        <span className="font-medium text-gray-900">
+                                                            {comment.user
+                                                                ?.name ||
+                                                                'Guest'}
+                                                        </span>
                                                     </div>
-                                                    <span className="font-medium text-gray-900">
-                                                        {comment.user.name}
-                                                    </span>
+
+                                                    {/* Delete button only for comment owner or post owner */}
+                                                    {(auth.user?.id ===
+                                                        comment.user?.id ||
+                                                        auth.user?.id ===
+                                                            post.user.id) && (
+                                                        <button
+                                                            className="text-red-600 hover:text-red-700"
+                                                            onClick={() =>
+                                                                handleDeleteComment(
+                                                                    comment.id,
+                                                                )
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    )}
                                                 </div>
                                                 <p className="text-sm text-gray-700">
                                                     {comment.comment}
@@ -220,7 +257,10 @@ export default function PostDetail({ post }: PostDetailProps) {
 
                             {/* Add Comment Form */}
                             <div className="border-t border-gray-100 p-6">
-                                <form className="space-y-3">
+                                <form
+                                    onSubmit={handleCommentSubmit}
+                                    className="space-y-3"
+                                >
                                     <div>
                                         <label
                                             htmlFor="comment"
@@ -231,6 +271,13 @@ export default function PostDetail({ post }: PostDetailProps) {
                                         <textarea
                                             id="comment"
                                             rows={3}
+                                            value={data.comment}
+                                            onChange={(e) =>
+                                                setData(
+                                                    'comment',
+                                                    e.target.value,
+                                                )
+                                            }
                                             className="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                             placeholder="Share your thoughts..."
                                         />

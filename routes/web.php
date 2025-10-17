@@ -1,15 +1,19 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\LikeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
 
 Route::get('/', function () {
     return Inertia::render('auth/login');
 })->name('home');
 
 Route::get('posts', [PostController::class, 'index'])->name('dashboard');
+Route::post('/posts/{id}/comments', [CommentController::class, 'store'])->name('comments.store');
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('posts/create', [PostController::class, 'create'])->name('posts.create');
@@ -19,6 +23,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
     Route::post('/posts/{post}/like', [LikeController::class, 'store'])->name('posts.like');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 });
 
 require __DIR__.'/settings.php';
