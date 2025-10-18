@@ -5,6 +5,7 @@ A full-featured blog application built with Laravel, React/Inertia, and PostgreS
 ## 🚀 Features
 
 ### Core Features
+
 - **User Authentication** - Registration, login, logout with Laravel Breeze
 - **Blog Posts** - Create, read, update, delete posts with rich content
 - **Comments System** - Add comments to posts
@@ -13,6 +14,7 @@ A full-featured blog application built with Laravel, React/Inertia, and PostgreS
 - **Responsive Design** - Beautiful UI with Tailwind CSS
 
 ### Advanced Features
+
 - **Post Scheduling** - Schedule posts for automatic future publishing
 - **Statistics Dashboard** - Comprehensive post statistics and user engagement analytics
 - **Role-based Access Control** - Admin and user roles with different permissions
@@ -31,54 +33,70 @@ A full-featured blog application built with Laravel, React/Inertia, and PostgreS
 ## 📦 Quick Start
 
 ### Prerequisites
+
 - Docker & Docker Compose
 - Node.js V22 (optional, for local development) (use NVM)
 
 ### Installation & Setup
 
 1. **Clone and start the application:**
+
 ```bash
 git clone git@github.com:tahamiskini/ominimo-assessment-test.git
-cd blog-app
+cd ominimo-assessment-test
+cp .env.example .env
 docker compose up -d --build
 ```
 
 2. **Run initial setup & DB seed:**
+
 ```bash
-docker compose exec app /bin/bash -c "cd /var/www && ./docker/setup.sh" 
+docker compose exec app /bin/bash -c "cd /var/www && ./docker/setup.sh"
 ```
 
 3. **Build frontend assets:**
+
 ```bash
+docker compose exec app npm install
 docker compose exec app npm run build
 ```
 
 4. **Start the scheduler (for post scheduling):**
+
 ```bash
 docker compose up -d scheduler
 ```
 
+```bash
+# Fix storage and cache permissions
+docker compose exec app chmod -R 777 /var/www/storage
+docker compose exec app chmod -R 777 /var/www/bootstrap/cache
+```
+
 5. **Access the application:**
+
 - **Main App**: http://localhost:8000
 - **PgAdmin**: http://localhost:5052
 
 ### Default Login Credentials
 
 - **Admin User**
-  - Email: `admin@blog.com`
-  - Password: `password123`
+    - Email: `admin@blog.com`
+    - Password: `password123`
 
 - **Regular User**
-  - Email: `user@blog.com`
-  - Password: `password123`
+    - Email: `user@blog.com`
+    - Password: `password123`
 
 ## 🗄 Database Access
 
 **PgAdmin Console**: http://localhost:5052
+
 - Email: `admin@example.com`
 - Password: `admin`
 
 **Database Connection**:
+
 - Host: `db`
 - Port: `5432`
 - Database: `blog_db`
@@ -88,6 +106,7 @@ docker compose up -d scheduler
 ## 🎯 API Endpoints
 
 ### Posts
+
 - `GET /posts` - List all posts (filtered by user role)
 - `GET /posts/create` - Create post form (authenticated)
 - `POST /posts` - Store new post (authenticated)
@@ -97,10 +116,12 @@ docker compose up -d scheduler
 - `DELETE /posts/{id}` - Delete post (owner or admin)
 
 ### Comments
+
 - `POST /posts/{id}/comments` - Add comment (authenticated/guests)
 - `DELETE /comments/{id}` - Delete comment (owner or post owner or admin)
 
 ### Scheduling
+
 - `POST /posts/schedule` - Schedule post for future publishing
 
 - `GET /posts/statistics` - Post analytics and engagement statistics (all users)
@@ -114,8 +135,6 @@ The application consists of 5 Docker services:
 - **`db`** - PostgreSQL database
 - **`scheduler`** - Laravel task scheduler (for post scheduling)
 - **`pgadmin`** - Database administration interface
-
-
 
 ## 📝 License
 
