@@ -9,4 +9,6 @@ export const routes = {
     likePost: (id: number) => `/posts/${id}/like`,
     addComment: (postId: number) => `/posts/${postId}/comments`,
     deleteComment: (commentId: number) => `/comments/${commentId}`,
+    // schedulePost: () => `/posts/schedule`,
+    postStatistics: () => `/posts/statistics`,
 };

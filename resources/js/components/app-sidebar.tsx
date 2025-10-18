@@ -9,6 +9,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { routes } from '@/lib/routes';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
@@ -18,12 +19,12 @@ import AppLogo from './app-logo';
 const mainNavItems: NavItem[] = [
     {
         title: 'Home',
-        href: dashboard(),
+        href: routes.dashboard(),
         icon: LayoutGrid,
     },
     {
         title: 'Statistics',
-        href: dashboard(),
+        href: routes.postStatistics(),
         icon: ScatterChart,
     },
 ];
