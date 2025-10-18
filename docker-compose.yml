@@ -59,6 +59,30 @@ services:
     networks:
       - laravel_network
 
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_scheduler
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=blog_db
+      - DB_USERNAME=blog_user
+      - DB_PASSWORD=secret
+    command: >
+      sh -c "php artisan schedule:work"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - laravel_network
+
   pgadmin:
     image: dpage/pgadmin4:latest
     restart: always

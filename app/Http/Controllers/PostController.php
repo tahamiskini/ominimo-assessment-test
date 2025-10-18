@@ -127,4 +127,24 @@ class PostController extends Controller
 
         return redirect()->route('dashboard')->with('success', 'Post deleted successfully.');
     }
+
+    public function schedule(Request $request)
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'content' => 'required|string',
+        'scheduled_at' => 'required|date|after_or_equal:now',
+    ]);
+
+    $post = Post::create([
+        'title' => $request->title,
+        'content' => $request->content,
+        'user_id' => $request->user()->id,
+        'scheduled_at' => $request->scheduled_at,
+        'is_published' => false,
+    ]);
+
+    return redirect()->route('dashboard')->with('success', 'Post scheduled successfully!');
+}
+
 }

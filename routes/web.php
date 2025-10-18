@@ -22,7 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
     Route::post('/posts/{post}/like', [LikeController::class, 'store'])->name('posts.like');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
-    // Route::post('/posts/schedule', [PostController::class, 'schedule'])->name('posts.schedule');
+    Route::post('/posts/schedule', [PostController::class, 'schedule'])->name('posts.schedule');
     Route::get('/posts/statistics', [PostStatisticsController::class, 'index'])
         ->name('posts.statistics');
 

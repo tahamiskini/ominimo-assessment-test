@@ -5,11 +5,14 @@ import {
     Calendar,
     Clock,
     Edit,
+    FileText,
     Heart,
     MessageCircle,
     MoreVertical,
     Plus,
     Trash2,
+    Type,
+    X,
 } from 'lucide-react';
 import { useState } from 'react';
 import { routes } from '../lib/routes';
@@ -311,79 +314,244 @@ export default function Dashboard({ posts, auth }: DashboardProps) {
                 })}
             </div>
 
-            {/* Schedule Modal */}
+            {/* Enhanced Schedule Modal */}
             {scheduleModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
-                    <div className="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-                        <h3 className="mb-4 text-lg font-semibold text-gray-900">
-                            Schedule New Post
-                        </h3>
-                        <form
-                            onSubmit={handleScheduleSubmit}
-                            className="space-y-4"
-                        >
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Title
-                                </label>
-                                <input
-                                    type="text"
-                                    value={data.title}
-                                    onChange={(e) =>
-                                        setData('title', e.target.value)
-                                    }
-                                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Content
-                                </label>
-                                <textarea
-                                    value={data.content}
-                                    onChange={(e) =>
-                                        setData('content', e.target.value)
-                                    }
-                                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    rows={4}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Scheduled At
-                                </label>
-                                <input
-                                    type="datetime-local"
-                                    value={data.scheduled_at}
-                                    onChange={(e) =>
-                                        setData('scheduled_at', e.target.value)
-                                    }
-                                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    required
-                                />
-                            </div>
-                            <div className="flex justify-end gap-2">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+                    <div
+                        className="relative w-full max-w-2xl animate-in duration-200 fade-in zoom-in"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Modal Card */}
+                        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl">
+                            {/* Header with gradient */}
+                            <div className="relative overflow-hidden border-b border-gray-100 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-600 px-6 py-8">
+                                <div className="bg-grid-white/10 absolute inset-0" />
+                                <div className="relative flex items-center gap-4">
+                                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 shadow-lg backdrop-blur-sm">
+                                        <Clock className="h-7 w-7 text-white" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-2xl font-bold text-white">
+                                            Schedule New Post
+                                        </h3>
+                                        <p className="mt-1 text-sm text-white/90">
+                                            Plan ahead and publish at the
+                                            perfect time
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Close button */}
                                 <button
                                     type="button"
                                     onClick={() => setScheduleModalOpen(false)}
-                                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                    className="absolute top-4 right-4 rounded-full bg-white/20 p-2 text-white backdrop-blur-sm transition hover:bg-white/30"
                                 >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
-                                >
-                                    Schedule Post
+                                    <X className="h-5 w-5" />
                                 </button>
                             </div>
-                        </form>
+
+                            {/* Form Body */}
+                            <form
+                                onSubmit={handleScheduleSubmit}
+                                className="p-6"
+                            >
+                                <div className="space-y-6">
+                                    {/* Title Field */}
+                                    <div className="group">
+                                        <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                            <Type className="h-4 w-4 text-blue-600" />
+                                            Post Title
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={data.title}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        'title',
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                className="w-full rounded-xl border-2 border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium shadow-sm transition-all placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 focus:outline-none"
+                                                placeholder="Enter an engaging title..."
+                                                required
+                                            />
+                                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                                <span className="text-xs text-gray-400">
+                                                    {data.title.length}/100
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Content Field */}
+                                    <div className="group">
+                                        <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                            <FileText className="h-4 w-4 text-blue-600" />
+                                            Post Content
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
+                                        </label>
+                                        <div className="relative">
+                                            <textarea
+                                                value={data.content}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        'content',
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                className="w-full resize-none rounded-xl border-2 border-gray-200 bg-gray-50 px-4 py-3 text-sm leading-relaxed shadow-sm transition-all placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 focus:outline-none"
+                                                rows={6}
+                                                placeholder="What's on your mind? Share your thoughts..."
+                                                required
+                                            />
+                                            <div className="pointer-events-none absolute right-3 bottom-3">
+                                                <span className="text-xs text-gray-400">
+                                                    {data.content.length}{' '}
+                                                    characters
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Schedule Date Time Field */}
+                                    <div className="group">
+                                        <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                            <Calendar className="h-4 w-4 text-blue-600" />
+                                            Schedule For
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                type="datetime-local"
+                                                value={data.scheduled_at}
+                                                onChange={(e) =>
+                                                    setData(
+                                                        'scheduled_at',
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                min={new Date()
+                                                    .toISOString()
+                                                    .slice(0, 16)}
+                                                className="w-full rounded-xl border-2 border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium shadow-sm transition-all focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 focus:outline-none"
+                                                required
+                                            />
+                                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                                <Clock className="h-4 w-4 text-gray-400" />
+                                            </div>
+                                        </div>
+                                        <p className="mt-2 flex items-center gap-1.5 text-xs text-gray-600">
+                                            <svg
+                                                className="h-4 w-4 text-blue-500"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                />
+                                            </svg>
+                                            Your post will be automatically
+                                            published at the scheduled time
+                                        </p>
+                                    </div>
+
+                                    {/* Preview Info Box */}
+                                    {data.scheduled_at && (
+                                        <div className="rounded-xl border-2 border-blue-100 bg-blue-50 p-4">
+                                            <div className="flex items-start gap-3">
+                                                <div className="rounded-lg bg-blue-100 p-2">
+                                                    <Calendar className="h-5 w-5 text-blue-600" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h4 className="text-sm font-semibold text-blue-900">
+                                                        Scheduled Summary
+                                                    </h4>
+                                                    <p className="mt-1 text-xs text-blue-700">
+                                                        Your post will be
+                                                        published on{' '}
+                                                        <span className="font-semibold">
+                                                            {new Date(
+                                                                data.scheduled_at,
+                                                            ).toLocaleDateString(
+                                                                'en-US',
+                                                                {
+                                                                    weekday:
+                                                                        'long',
+                                                                    year: 'numeric',
+                                                                    month: 'long',
+                                                                    day: 'numeric',
+                                                                },
+                                                            )}
+                                                        </span>
+                                                        {' at '}
+                                                        <span className="font-semibold">
+                                                            {new Date(
+                                                                data.scheduled_at,
+                                                            ).toLocaleTimeString(
+                                                                'en-US',
+                                                                {
+                                                                    hour: '2-digit',
+                                                                    minute: '2-digit',
+                                                                },
+                                                            )}
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Footer Actions */}
+                                <div className="mt-8 flex items-center justify-between border-t border-gray-100 pt-6">
+                                    <p className="text-xs text-gray-600">
+                                        <span className="font-medium text-red-500">
+                                            *
+                                        </span>{' '}
+                                        Required fields
+                                    </p>
+                                    <div className="flex gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setScheduleModalOpen(false)
+                                            }
+                                            className="rounded-xl border-2 border-gray-200 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:shadow"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg transition-all hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl"
+                                        >
+                                            <span className="relative z-10 flex items-center gap-2">
+                                                <Clock className="h-4 w-4" />
+                                                Schedule Post
+                                            </span>
+                                            <div className="absolute inset-0 bg-white opacity-0 transition-opacity group-hover:opacity-10" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}
 
+            {/* Delete Modal */}
             {deleteModal.isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
                     <div className="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
