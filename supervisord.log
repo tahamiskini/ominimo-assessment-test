@@ -50,3 +50,26 @@
 2025-10-18 02:34:21,006 INFO reaped unknown pid 905 (exit status 0)
 2025-10-18 02:35:42,164 INFO reaped unknown pid 965 (exit status 0)
 2025-10-18 02:37:45,403 INFO reaped unknown pid 1025 (exit status 0)
+2025-10-18 12:47:26,062 WARN received SIGQUIT indicating exit request
+2025-10-18 12:47:26,069 INFO waiting for nginx, php-fpm to die
+2025-10-18 12:47:26,103 INFO stopped: php-fpm (exit status 0)
+2025-10-18 12:47:26,143 INFO stopped: nginx (exit status 0)
+2025-10-18 12:47:28,004 INFO Set uid to user 0 succeeded
+2025-10-18 12:47:28,007 INFO supervisord started with pid 1
+2025-10-18 12:47:29,010 INFO spawned: 'nginx' with pid 7
+2025-10-18 12:47:29,013 INFO spawned: 'php-fpm' with pid 8
+2025-10-18 12:47:30,068 INFO success: nginx entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-18 12:47:30,068 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-18 12:49:47,637 WARN received SIGQUIT indicating exit request
+2025-10-18 12:49:47,650 INFO waiting for nginx, php-fpm to die
+2025-10-18 12:49:48,752 INFO stopped: php-fpm (exit status 0)
+2025-10-18 12:49:49,782 INFO stopped: nginx (exit status 0)
+2025-10-18 12:50:50,129 INFO Set uid to user 0 succeeded
+2025-10-18 12:50:50,133 INFO supervisord started with pid 1
+2025-10-18 12:50:51,139 INFO spawned: 'nginx' with pid 7
+2025-10-18 12:50:51,146 INFO spawned: 'php-fpm' with pid 8
+2025-10-18 12:50:52,322 INFO success: nginx entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-18 12:50:52,322 INFO success: php-fpm entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-10-18 12:51:57,436 INFO reaped unknown pid 73 (exit status 0)
+2025-10-18 12:52:27,854 INFO reaped unknown pid 174 (exit status 0)
+2025-10-18 12:53:23,965 INFO reaped unknown pid 219 (exit status 0)
