@@ -3,6 +3,7 @@ import { BreadcrumbItem } from '@/types';
 import { Link, router, useForm } from '@inertiajs/react';
 import {
     Calendar,
+    Clock,
     Edit,
     Heart,
     MessageCircle,
@@ -44,6 +45,24 @@ interface DashboardProps {
 
 export default function Dashboard({ posts, auth }: DashboardProps) {
     const [openMenu, setOpenMenu] = useState<number | null>(null);
+    const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+
+    const { data, setData, post, reset } = useForm({
+        title: '',
+        content: '',
+        scheduled_at: '',
+    });
+
+    const handleScheduleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(routes.schedulePost(), {
+            onSuccess: () => {
+                reset();
+                setScheduleModalOpen(false);
+            },
+        });
+    };
+
     const [deleteModal, setDeleteModal] = useState<{
         isOpen: boolean;
         postId: number | null;
@@ -92,14 +111,10 @@ export default function Dashboard({ posts, auth }: DashboardProps) {
     const handleLike = (postId: number, e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-
         router.post(
             routes.likePost(postId),
             {},
-            {
-                preserveScroll: true,
-                preserveState: true,
-            },
+            { preserveScroll: true, preserveState: true },
         );
     };
 
@@ -107,20 +122,29 @@ export default function Dashboard({ posts, auth }: DashboardProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="mb-6 flex items-center justify-between px-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Home</h1>
                     <p className="mt-1 text-sm text-muted-foreground">
                         Discover and engage with the latest posts from the
                         community
                     </p>
                 </div>
 
-                <Link
-                    href={routes.createPost()}
-                    className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700"
-                >
-                    <Plus className="h-4 w-4" />
-                    Write a Post
-                </Link>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => setScheduleModalOpen(true)}
+                        className="mt-4 flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700"
+                    >
+                        <Clock className="h-4 w-4" />
+                        Schedule Post
+                    </button>
+
+                    <Link
+                        href={routes.createPost()}
+                        className="mt-4 flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Write a Post
+                    </Link>
+                </div>
             </div>
 
             <div className="grid auto-rows-min gap-6 px-4 md:grid-cols-2 lg:grid-cols-3">
@@ -150,7 +174,6 @@ export default function Dashboard({ posts, auth }: DashboardProps) {
                                                 {post.title}
                                             </h2>
 
-                                            {/* Edit Menu - Only show for post owner /admin */}
                                             {(auth.user.role === 'admin' ||
                                                 auth.user.id ===
                                                     post.user.id) && (
@@ -171,7 +194,6 @@ export default function Dashboard({ posts, auth }: DashboardProps) {
                                                         <MoreVertical className="h-4 w-4" />
                                                     </button>
 
-                                                    {/* Dropdown Menu */}
                                                     {openMenu === post.id && (
                                                         <div className="absolute top-8 right-0 z-10 w-40 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
                                                             <Link
@@ -179,14 +201,9 @@ export default function Dashboard({ posts, auth }: DashboardProps) {
                                                                     post.id,
                                                                 )}
                                                                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                                                onClick={(
-                                                                    e,
-                                                                ) => {
-                                                                    e.stopPropagation();
-                                                                    setOpenMenu(
-                                                                        null,
-                                                                    );
-                                                                }}
+                                                                onClick={(e) =>
+                                                                    e.stopPropagation()
+                                                                }
                                                             >
                                                                 <Edit className="h-4 w-4" />
                                                                 Edit
@@ -246,7 +263,6 @@ export default function Dashboard({ posts, auth }: DashboardProps) {
                                             </div>
                                         </div>
 
-                                        {/* ❤️ Like / 💬 Comment buttons */}
                                         <div className="flex items-center gap-4 border-y border-gray-100 py-3">
                                             <button
                                                 className={`flex items-center gap-1.5 rounded-md px-2 py-1 transition ${
@@ -259,11 +275,7 @@ export default function Dashboard({ posts, auth }: DashboardProps) {
                                                 }
                                             >
                                                 <Heart
-                                                    className={`h-4 w-4 ${
-                                                        isLiked
-                                                            ? 'fill-red-600 text-red-600'
-                                                            : ''
-                                                    }`}
+                                                    className={`h-4 w-4 ${isLiked ? 'fill-red-600 text-red-600' : ''}`}
                                                 />
                                                 <span className="text-sm font-medium">
                                                     {post.likes.length}
@@ -275,6 +287,14 @@ export default function Dashboard({ posts, auth }: DashboardProps) {
                                                 onClick={(e) => {
                                                     e.preventDefault();
                                                     e.stopPropagation();
+                                                    router.visit(
+                                                        routes.showPost(
+                                                            post.id,
+                                                        ),
+                                                        {
+                                                            preserveScroll: true,
+                                                        },
+                                                    );
                                                 }}
                                             >
                                                 <MessageCircle className="h-4 w-4" />
@@ -290,6 +310,79 @@ export default function Dashboard({ posts, auth }: DashboardProps) {
                     );
                 })}
             </div>
+
+            {/* Schedule Modal */}
+            {scheduleModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
+                    <div className="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                        <h3 className="mb-4 text-lg font-semibold text-gray-900">
+                            Schedule New Post
+                        </h3>
+                        <form
+                            onSubmit={handleScheduleSubmit}
+                            className="space-y-4"
+                        >
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Title
+                                </label>
+                                <input
+                                    type="text"
+                                    value={data.title}
+                                    onChange={(e) =>
+                                        setData('title', e.target.value)
+                                    }
+                                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Content
+                                </label>
+                                <textarea
+                                    value={data.content}
+                                    onChange={(e) =>
+                                        setData('content', e.target.value)
+                                    }
+                                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    rows={4}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Scheduled At
+                                </label>
+                                <input
+                                    type="datetime-local"
+                                    value={data.scheduled_at}
+                                    onChange={(e) =>
+                                        setData('scheduled_at', e.target.value)
+                                    }
+                                    className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    required
+                                />
+                            </div>
+                            <div className="flex justify-end gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setScheduleModalOpen(false)}
+                                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+                                >
+                                    Schedule Post
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             {deleteModal.isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">

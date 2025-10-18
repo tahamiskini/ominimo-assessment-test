@@ -4,6 +4,9 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Post>
+ */
 class PostFactory extends Factory
 {
     public function definition(): array
@@ -21,11 +24,9 @@ class PostFactory extends Factory
             'The Power of Tailwind CSS in Modern UI Design',
         ];
 
-        $title = fake()->randomElement($titles);
-
         return [
-            'title' => $title,
-            'content' => fake()->paragraphs(3, true),
+            'title' => $this->faker->randomElement($titles),
+            'content' => $this->faker->paragraphs(3, true),
             'image' => 'https://unsplash.com/s/photos/react',
         ];
     }
