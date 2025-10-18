@@ -5,16 +5,16 @@ A full-featured blog application built with Laravel, React/Inertia, and PostgreS
 ## 🚀 Features
 
 ### Core Features
-- **User Authentication** - Registration, login, logout with Laravel Fortify
+- **User Authentication** - Registration, login, logout with Laravel Breeze
 - **Blog Posts** - Create, read, update, delete posts with rich content
-- **Comments System** - Add comments to posts (authenticated users & guests)
+- **Comments System** - Add comments to posts
 - **Likes/Reactions** - Like posts with real-time updates
 - **Image Upload** - Support for post images with proper storage handling
 - **Responsive Design** - Beautiful UI with Tailwind CSS
 
 ### Advanced Features
 - **Post Scheduling** - Schedule posts for automatic future publishing
-- **Admin Dashboard** - Comprehensive post statistics and user engagement analytics
+- **Statistics Dashboard** - Comprehensive post statistics and user engagement analytics
 - **Role-based Access Control** - Admin and user roles with different permissions
 - **Real-time Notifications** - Inertia-based real-time UI updates
 
@@ -25,27 +25,27 @@ A full-featured blog application built with Laravel, React/Inertia, and PostgreS
 - **Styling**: Tailwind CSS + Lucide React icons
 - **Database**: PostgreSQL
 - **Containerization**: Docker & Docker Compose
-- **Authentication**: Laravel Fortify
+- **Authentication**: Laravel Breeze
 - **Scheduling**: Laravel Task Scheduler
 
 ## 📦 Quick Start
 
 ### Prerequisites
 - Docker & Docker Compose
-- Node.js (optional, for local development)
+- Node.js V22 (optional, for local development) (use NVM)
 
 ### Installation & Setup
 
 1. **Clone and start the application:**
 ```bash
-git clone <your-repo-url>
+git clone git@github.com:tahamiskini/ominimo-assessment-test.git
 cd blog-app
 docker compose up -d --build
 ```
 
-2. **Run initial setup:**
+2. **Run initial setup & DB seed:**
 ```bash
-docker compose exec app /bin/bash -c "cd /var/www && ./docker/setup.sh"
+docker compose exec app /bin/bash -c "cd /var/www && ./docker/setup.sh" 
 ```
 
 3. **Build frontend assets:**
